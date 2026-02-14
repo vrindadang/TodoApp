@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,12 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Executive Ops | Task Management</title>
     <script>
-      // Non-destructive polyfill for process.env
-      window.process = window.process || {};
-      window.process.env = window.process.env || {};
-      if (typeof window.process.env.NODE_ENV === 'undefined') {
-        window.process.env.NODE_ENV = 'production';
-      }
+      // Robust polyfill for process.env before any modules load
+      window.process = {
+        env: {
+          NODE_ENV: 'production',
+          API_KEY: '',
+          SUPABASE_URL: '',
+          SUPABASE_KEY: ''
+        }
+      };
+      // Make it globally accessible for libraries that expect it
+      var process = window.process;
+
+      // Global error handler to help diagnose blank screen issues
+      window.onerror = function(message, source, lineno, colno, error) {
+        console.error('Fatal Error:', message, 'at', source, lineno);
+        const errorDiv = document.createElement('div');
+        errorDiv.id = 'fatal-error-overlay';
+        errorDiv.style.position = 'fixed';
+        errorDiv.style.top = '0';
+        errorDiv.style.left = '0';
+        errorDiv.style.width = '100%';
+        errorDiv.style.background = '#fee2e2';
+        errorDiv.style.color = '#991b1b';
+        errorDiv.style.padding = '1.5rem';
+        errorDiv.style.zIndex = '99999';
+        errorDiv.style.fontFamily = 'monospace';
+        errorDiv.style.fontSize = '14px';
+        errorDiv.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+        errorDiv.innerHTML = `
+          <div style="max-width: 800px; margin: 0 auto;">
+            <h1 style="margin-top: 0; font-size: 18px; font-weight: bold;">Application Error</h1>
+            <p style="margin: 10px 0;">The application failed to load. This usually happens due to missing environment variables or network issues.</p>
+            <pre style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 4px; overflow: auto;">${message}\nSource: ${source}\nLine: ${lineno}:${colno}</pre>
+            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #991b1b; color: white; border: none; border-radius: 4px; cursor: pointer;">Reload Page</button>
+          </div>
+        `;
+        document.body.appendChild(errorDiv);
+        return false;
+      };
+
+      window.onunhandledrejection = function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+      };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -2,7 +2,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { NLUResponse, ExtractedActionable, Category, Priority, Task } from "../types.ts";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+/**
+ * We lazily initialize the AI client to prevent top-level module crashes 
+ * if environment variables are missing during the initial load.
+ */
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (aiInstance) return aiInstance;
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.warn("Gemini API Key is missing. AI features will be limited.");
+    return null;
+  }
+  try {
+    aiInstance = new GoogleGenAI({ apiKey });
+    return aiInstance;
+  } catch (e) {
+    console.error("Failed to initialize GoogleGenAI:", e);
+    return null;
+  }
+};
 
 const SYSTEM_INSTRUCTION = `
 You are an Executive Legal & Tax Operations Assistant. Your goal is to parse natural language commands into structured JSON data or UI actions.
@@ -28,6 +48,9 @@ Current Date Reference: ${new Date().toLocaleDateString()} (${new Date().toLocal
 `;
 
 export const processNaturalLanguage = async (input: string): Promise<NLUResponse> => {
+  const ai = getAI();
+  if (!ai) return { action: 'UNKNOWN', confirmationMessage: "AI service not available. Check configuration." };
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -48,6 +71,9 @@ export const processNaturalLanguage = async (input: string): Promise<NLUResponse
 };
 
 export const extractActionablesFromImage = async (base64Data: string, mimeType: string): Promise<ExtractedActionable[]> => {
+  const ai = getAI();
+  if (!ai) return [];
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -85,6 +111,9 @@ export const extractActionablesFromImage = async (base64Data: string, mimeType: 
 };
 
 export const generateFollowUpDraft = async (task: Task, userName: string): Promise<string> => {
+  const ai = getAI();
+  if (!ai) return "AI service unavailable.";
+  
   try {
     const isSKRM = task.org === 'SKRM';
     const context = isSKRM 
