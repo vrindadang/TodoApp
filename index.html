@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Executive Ops | Task Management</title>
     <script>
-      // Global polyfill for process.env - must run before any module imports
-      window.process = { 
-        env: {
-          NODE_ENV: 'production'
-        } 
-      };
+      // Non-destructive polyfill for process.env
+      window.process = window.process || {};
+      window.process.env = window.process.env || {};
+      if (typeof window.process.env.NODE_ENV === 'undefined') {
+        window.process.env.NODE_ENV = 'production';
+      }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
