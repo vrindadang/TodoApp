@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, Briefcase, Rocket, FileText, Settings, HeartHandshake } from 'lucide-react';
-import { Category, Priority, Task } from '../types';
+import { Category, Priority, Task } from '../types.ts';
 
 interface TaskModalProps {
   isOpen: boolean;

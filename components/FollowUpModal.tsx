@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Send, Copy, Check, Sparkles, Loader2, MessageSquare, AlertTriangle } from 'lucide-react';
-import { Task, Status, FollowUpDraft } from '../types';
-import { generateFollowUpDraft } from '../services/geminiService';
+import { Task, Status, FollowUpDraft } from '../types.ts';
+import { generateFollowUpDraft } from '../services/geminiService.ts';
 
 interface FollowUpModalProps {
   isOpen: boolean;
@@ -14,7 +14,6 @@ interface FollowUpModalProps {
 export const FollowUpModal: React.FC<FollowUpModalProps> = ({ isOpen, onClose, tasks, userName }) => {
   const [drafts, setDrafts] = useState<FollowUpDraft[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  // Initialized with null instead of a literal number to match types and avoid React errors.
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const overdueTasks = tasks.filter(t => 

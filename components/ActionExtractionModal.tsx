@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from 'react';
 import { X, Upload, FileText, Loader2, CheckCircle2, AlertCircle, Sparkles, Plus } from 'lucide-react';
-import { extractActionablesFromImage } from '../services/geminiService';
-import { ExtractedActionable, Task, Category, Priority, Status } from '../types';
+import { extractActionablesFromImage } from '../services/geminiService.ts';
+import { ExtractedActionable, Task, Category, Priority, Status } from '../types.ts';
 
 interface ActionExtractionModalProps {
   isOpen: boolean;
