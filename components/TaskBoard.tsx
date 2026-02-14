@@ -1,11 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
-import { Task, ViewMode, Category, Status, Priority } from '../types';
+import { Task, ViewMode, Category, Status, Priority } from '../types.ts';
 import { Clock, User, CheckCircle2, Circle, AlertCircle, Search, Plus, Zap, MessageSquare } from 'lucide-react';
 
 interface TaskBoardProps {
   tasks: Task[];
-  viewMode: ViewMode;
+  viewMode: ViewMode | 'Overview';
   onStatusChange: (id: string, status: Status) => void;
   onAddTaskToClient?: (clientName: string) => void;
   clientLabel: string;
@@ -83,18 +83,6 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, onStatusChange, clientLabel }) 
             <span>•</span>
             <span className="uppercase tracking-wider text-[10px]">{task.category}</span>
           </div>
-          
-          {isOverdue && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-               <button 
-                 title="AI Nudge"
-                 className="flex items-center gap-1.5 px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition-colors font-bold text-[10px]"
-               >
-                 <MessageSquare className="w-3 h-3" />
-                 NUDGE
-               </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

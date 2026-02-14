@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Users, Briefcase, Filter, Scale, Plus, Building2, LogOut, Settings, Database, Star, HeartHandshake, Sparkles, MessageSquare, Loader2 } from 'lucide-react';
+import { Users, Briefcase, Filter, Scale, Plus, Building2, LogOut, Settings, Database, Star, HeartHandshake, Sparkles, MessageSquare, Loader2, BarChart3, LayoutDashboard } from 'lucide-react';
 import { Task, Category, Status, ViewMode, Priority, ExtractedActionable } from './types.ts';
 import { TaskBoard } from './components/TaskBoard.tsx';
+import { Dashboard } from './components/Dashboard.tsx';
 import { TaskModal } from './components/TaskModal.tsx';
 import { ProfileModal } from './components/ProfileModal.tsx';
 import { MasterListModal } from './components/MasterListModal.tsx';
@@ -11,6 +12,7 @@ import { FollowUpModal } from './components/FollowUpModal.tsx';
 import { supabase } from './services/supabaseClient.ts';
 
 type Org = 'EY' | 'SKRM' | null;
+type AppViewMode = ViewMode | 'Overview';
 
 function App() {
   const [currentOrg, setCurrentOrg] = useState<Org>(null);
@@ -24,7 +26,7 @@ function App() {
   const [skrmSewa, setSkrmSewa] = useState<string[]>(['DEF', 'Canteen', 'Security', 'Green Room']);
   const [juniorMasterList, setJuniorMasterList] = useState<string[]>(['Rahul', 'Sarah']);
   
-  const [viewMode, setViewMode] = useState<ViewMode>('Today');
+  const [viewMode, setViewMode] = useState<AppViewMode>('Today');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
@@ -34,7 +36,6 @@ function App() {
   const [pendingTaskData, setPendingTaskData] = useState<Partial<Task> | null>(null);
   const [lastConfirmation, setLastConfirmation] = useState<string | null>(null);
 
-  // Fetch tasks from Supabase on start
   useEffect(() => {
     const fetchTasks = async () => {
       setIsLoading(true);
@@ -95,7 +96,6 @@ function App() {
     else setEyClients(newClients);
   };
 
-  // AddTask function: Uses currentOrg to fill in the 'org' property.
   const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'status' | 'org'>) => {
     if (!currentOrg) return;
     
@@ -176,11 +176,6 @@ function App() {
     }
   };
 
-  const handleOpenModal = (clientName?: string) => {
-    setPendingTaskData(clientName ? { client: clientName } : null);
-    setIsModalOpen(true);
-  };
-
   const updateTaskStatus = async (id: string, status: Status) => {
     try {
       const { error } = await supabase
@@ -195,7 +190,7 @@ function App() {
     }
   };
 
-  const NavButton = ({ mode, icon: Icon, label, onClick }: { mode?: ViewMode, icon: any, label: string, onClick?: () => void }) => (
+  const NavButton = ({ mode, icon: Icon, label, onClick }: { mode?: AppViewMode, icon: any, label: string, onClick?: () => void }) => (
     <button
       onClick={onClick || (() => mode && setViewMode(mode))}
       className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 ${
@@ -244,7 +239,7 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-10 hidden md:flex">
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto custom-scrollbar">
           <div className="flex items-center gap-3 text-slate-900 mb-8">
             <div className={`p-2 rounded-lg ${currentOrg === 'EY' ? 'bg-yellow-400' : 'bg-slate-900'}`}>
               <Building2 className={`w-6 h-6 ${currentOrg === 'EY' ? 'text-slate-900' : 'text-white'}`} />
@@ -255,6 +250,7 @@ function App() {
             </div>
           </div>
           <nav className="space-y-2">
+            <NavButton mode="Overview" icon={LayoutDashboard} label="Executive Overview" />
             <NavButton mode="Today" icon={Star} label="Today's Priority" />
             <NavButton mode="Client" icon={ClientIcon} label={`By ${clientLabel}`} />
             <NavButton mode="Category" icon={Filter} label="By Category" />
@@ -262,35 +258,16 @@ function App() {
             
             <div className="mt-4 pt-4 border-t border-slate-100">
               <h4 className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">AI Tools</h4>
-              <button 
-                onClick={() => setIsExtractionModalOpen(true)}
-                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 text-blue-600 hover:bg-blue-50 font-bold"
-              >
+              <button onClick={() => setIsExtractionModalOpen(true)} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 text-blue-600 hover:bg-blue-50 font-bold">
                 <Sparkles className="w-5 h-5" />
                 <span className="text-sm">Extract Actions</span>
               </button>
-              <button 
-                onClick={() => setIsNudgeModalOpen(true)}
-                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 text-indigo-600 hover:bg-indigo-50 font-bold mt-1"
-              >
+              <button onClick={() => setIsNudgeModalOpen(true)} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 text-indigo-600 hover:bg-indigo-50 font-bold mt-1">
                 <MessageSquare className="w-5 h-5" />
                 <span className="text-sm">Nudge Agent</span>
               </button>
             </div>
-
-            {currentOrg === 'EY' && (
-              <button onClick={() => setIsMasterModalOpen(true)} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-100 mt-2">
-                <Database className="w-5 h-5" />
-                <span className="font-medium text-sm">Master Lists</span>
-              </button>
-            )}
           </nav>
-          <div className="mt-8 pt-8 border-t border-slate-100">
-             <button onClick={() => handleOpenModal()} className="flex items-center justify-center gap-2 w-full px-4 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all hover:shadow-xl active:scale-[0.98]">
-              <Plus className="w-5 h-5" />
-              New Record
-            </button>
-          </div>
         </div>
         <div className="mt-auto p-6 border-t border-slate-100 space-y-4">
           <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-slate-50 transition-all text-left group">
@@ -301,7 +278,7 @@ function App() {
             </div>
             <Settings className="w-3.5 h-3.5 text-slate-300" />
           </button>
-          <button onClick={() => { setCurrentOrg(null); setViewMode('Today'); }} className="flex items-center gap-2 text-xs font-bold text-rose-600 hover:text-rose-700 w-full px-2">
+          <button onClick={() => setCurrentOrg(null)} className="flex items-center gap-2 text-xs font-bold text-rose-600 hover:text-rose-700 w-full px-2">
             <LogOut className="w-3.5 h-3.5" />
             Switch Workspace
           </button>
@@ -311,45 +288,41 @@ function App() {
       <main className="flex-1 md:ml-64 relative flex flex-col min-h-screen">
         <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4 flex items-center justify-between md:hidden sticky top-0 z-20">
           <div className="flex items-center gap-2 font-bold"><Building2 className="w-6 h-6" /> {currentOrg} Ops</div>
-          <div className="flex gap-2">
-            <button onClick={() => setIsNudgeModalOpen(true)} className="p-2 text-indigo-600 bg-indigo-50 rounded-lg"><MessageSquare className="w-5 h-5" /></button>
-            <button onClick={() => handleOpenModal()} className="p-2 bg-slate-900 text-white rounded-lg"><Plus className="w-5 h-5" /></button>
-          </div>
+          <button onClick={() => setIsModalOpen(true)} className="p-2 bg-slate-900 text-white rounded-lg"><Plus className="w-5 h-5" /></button>
         </header>
         <div className="flex-1 pb-12">
           {isLoading ? (
-             <div className="flex flex-col items-center justify-center h-64">
+             <div className="flex flex-col items-center justify-center h-96">
                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-               <p className="text-slate-500 mt-4 font-medium">Syncing with cloud...</p>
+               <p className="text-slate-500 mt-4 font-medium">Syncing data...</p>
              </div>
           ) : (
             <>
               <div className="px-8 pt-8 pb-4 flex justify-between items-end">
                 <div>
                   <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                    {viewMode === 'Today' ? "Today's Operational Flow" : `${viewMode === 'Client' ? clientLabel : (viewMode === 'Junior' ? juniorLabel : viewMode)} Dashboard`}
+                    {viewMode === 'Overview' ? 'Workspace Dashboard' : viewMode === 'Today' ? "Today's Operational Flow" : `${viewMode === 'Client' ? clientLabel : (viewMode === 'Junior' ? juniorLabel : viewMode)} Dashboard`}
                   </h2>
                   <p className="text-slate-500 mt-1 font-medium">{currentOrg} &bull; {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                 </div>
-                <button onClick={() => handleOpenModal()} className="hidden md:flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 shadow-sm transition-all">
-                  <Plus className="w-4 h-4" /> Add Entry
-                </button>
+                {viewMode !== 'Overview' && (
+                  <button onClick={() => setIsModalOpen(true)} className="hidden md:flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 shadow-sm transition-all">
+                    <Plus className="w-4 h-4" /> Add Entry
+                  </button>
+                )}
               </div>
-              {lastConfirmation && (
-                <div className="mx-8 mb-4 p-4 bg-slate-900 text-slate-100 rounded-lg shadow-lg flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                  <p className="text-sm font-medium">{lastConfirmation}</p>
-                </div>
+              {viewMode === 'Overview' ? (
+                <Dashboard tasks={currentOrgTasks} />
+              ) : (
+                <TaskBoard tasks={currentOrgTasks} viewMode={viewMode} onStatusChange={updateTaskStatus} clientLabel={clientLabel} juniorLabel={juniorLabel} />
               )}
-              <TaskBoard tasks={currentOrgTasks} viewMode={viewMode} onStatusChange={updateTaskStatus} onAddTaskToClient={handleOpenModal} clientLabel={clientLabel} juniorLabel={juniorLabel} />
             </>
           )}
         </div>
       </main>
 
-      <TaskModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setPendingTaskData(null); }} onSave={addTask} existingClients={existingClients} existingJuniors={existingJuniors} prefillData={pendingTaskData} clientLabel={clientLabel} juniorLabel={juniorLabel} />
+      <TaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={addTask} existingClients={existingClients} existingJuniors={existingJuniors} clientLabel={clientLabel} juniorLabel={juniorLabel} />
       <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} onSave={(n, d) => { setUserName(n); setUserDesignation(d); }} currentName={userName} currentDesignation={userDesignation} />
-      <MasterListModal isOpen={isMasterModalOpen} onClose={() => setIsMasterModalOpen(false)} clients={activeClientList} juniors={juniorMasterList} onUpdateClients={handleUpdateClients} onUpdateJuniors={setJuniorMasterList} clientLabel={clientLabel} />
       <ActionExtractionModal isOpen={isExtractionModalOpen} onClose={() => setIsExtractionModalOpen(false)} onConfirm={handleConfirmExtracted} clientLabel={clientLabel} />
       <FollowUpModal isOpen={isNudgeModalOpen} onClose={() => setIsNudgeModalOpen(false)} tasks={currentOrgTasks} userName={userName} />
     </div>

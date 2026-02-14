@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { Task, Category, Status } from '../types';
+import { Task, Category, Status } from '../types.ts';
 
 interface DashboardProps {
   tasks: Task[];

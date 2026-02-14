@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { NLUResponse, ExtractedActionable, Category, Priority, Task } from "../types";
+import { NLUResponse, ExtractedActionable, Category, Priority, Task } from "../types.ts";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
