@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, Briefcase, Rocket, FileText, Settings, HeartHandshake } from 'lucide-react';
 import { Category, Priority, Task } from '../types';
@@ -5,7 +6,8 @@ import { Category, Priority, Task } from '../types';
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (task: Omit<Task, 'id' | 'createdAt' | 'status'>) => void;
+  // onSave now excludes 'org' from its expected Task parameter
+  onSave: (task: Omit<Task, 'id' | 'createdAt' | 'status' | 'org'>) => void;
   existingClients: string[];
   existingJuniors: string[];
   prefillData?: Partial<Task> | null;
@@ -59,6 +61,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     e.preventDefault();
     if (!description || !client) return;
     
+    // Org is purposely omitted here as the parent component handles it.
     onSave({
       description,
       client,

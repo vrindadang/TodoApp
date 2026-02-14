@@ -1,14 +1,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Users, Briefcase, Filter, Scale, Plus, Building2, LogOut, Settings, Database, Star, HeartHandshake, Sparkles, MessageSquare, Loader2 } from 'lucide-react';
-import { Task, Category, Status, ViewMode, Priority, ExtractedActionable } from './types';
-import { TaskBoard } from './components/TaskBoard';
-import { TaskModal } from './components/TaskModal';
-import { ProfileModal } from './components/ProfileModal';
-import { MasterListModal } from './components/MasterListModal';
-import { ActionExtractionModal } from './components/ActionExtractionModal';
-import { FollowUpModal } from './components/FollowUpModal';
-import { supabase } from './services/supabaseClient';
+import { Task, Category, Status, ViewMode, Priority, ExtractedActionable } from './types.ts';
+import { TaskBoard } from './components/TaskBoard.tsx';
+import { TaskModal } from './components/TaskModal.tsx';
+import { ProfileModal } from './components/ProfileModal.tsx';
+import { MasterListModal } from './components/MasterListModal.tsx';
+import { ActionExtractionModal } from './components/ActionExtractionModal.tsx';
+import { FollowUpModal } from './components/FollowUpModal.tsx';
+import { supabase } from './services/supabaseClient.ts';
 
 type Org = 'EY' | 'SKRM' | null;
 
@@ -46,7 +46,6 @@ function App() {
 
         if (error) throw error;
         
-        // Map database fields back to our Task interface if they differ
         const mappedTasks: Task[] = (data || []).map(item => ({
           id: item.id,
           description: item.description,
@@ -96,7 +95,8 @@ function App() {
     else setEyClients(newClients);
   };
 
-  const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'status'>) => {
+  // AddTask function: Uses currentOrg to fill in the 'org' property.
+  const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'status' | 'org'>) => {
     if (!currentOrg) return;
     
     const newTaskObj = {
@@ -130,7 +130,6 @@ function App() {
       setTimeout(() => setLastConfirmation(null), 3000);
     } catch (err) {
       console.error("Error adding task:", err);
-      alert("Failed to save to cloud.");
     }
   };
 

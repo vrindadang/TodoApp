@@ -1,16 +1,12 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_KEY;
+// Environment variables are injected by the platform. 
+// We use fallbacks to prevent initialization crashes if they are temporarily missing.
+const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.SUPABASE_KEY || 'placeholder';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase credentials missing. Data will not save to the cloud. Please set SUPABASE_URL and SUPABASE_KEY in environment variables.");
+if (supabaseUrl === 'https://placeholder.supabase.co') {
+  console.warn("Supabase credentials missing. Data will not save to the cloud.");
 }
 
-// Fallback to placeholder values to prevent 'supabaseUrl is required' error during initialization.
-// If the URL is invalid, actual database requests will fail gracefully in the application.
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder'
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);

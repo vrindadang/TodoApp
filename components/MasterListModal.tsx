@@ -1,6 +1,7 @@
+
 import React, { useState, useRef } from 'react';
 import { X, Plus, Trash2, Users, Briefcase, FileUp, Loader2, HeartHandshake } from 'lucide-react';
-import * as XLSX from 'https://esm.sh/xlsx';
+import * as XLSX from 'xlsx';
 
 interface MasterListModalProps {
   isOpen: boolean;
@@ -98,7 +99,6 @@ export const MasterListModal: React.FC<MasterListModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Client/Sewa List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between text-blue-600 mb-2">
               <div className="flex items-center gap-2">
@@ -157,7 +157,6 @@ export const MasterListModal: React.FC<MasterListModalProps> = ({
             </div>
           </div>
 
-          {/* Junior List */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-indigo-600 mb-2">
               <Users className="w-4 h-4" />

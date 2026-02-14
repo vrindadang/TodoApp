@@ -14,7 +14,8 @@ interface FollowUpModalProps {
 export const FollowUpModal: React.FC<FollowUpModalProps> = ({ isOpen, onClose, tasks, userName }) => {
   const [drafts, setDrafts] = useState<FollowUpDraft[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(1); // Dummy for UX test
+  // Initialized with null instead of a literal number to match types and avoid React errors.
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const overdueTasks = tasks.filter(t => 
     (t.status === Status.Pending || t.status === Status.InProgress) && 
