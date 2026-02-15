@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Users, Briefcase, Filter, Scale, Plus, Building2, LogOut, Settings, Database, Star, HeartHandshake, Sparkles, MessageSquare, Loader2, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Users, Briefcase, Filter, Scale, Plus, Building2, LogOut, Settings, Database, Star, HeartHandshake, Sparkles, MessageSquare, Loader2, BarChart3, LayoutDashboard, MoreHorizontal, ChevronUp } from 'lucide-react';
 import { Task, Category, Status, ViewMode, Priority, ExtractedActionable } from './types.ts';
 import { TaskBoard } from './components/TaskBoard.tsx';
 import { Dashboard } from './components/Dashboard.tsx';
@@ -32,6 +32,7 @@ function App() {
   const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
   const [isExtractionModalOpen, setIsExtractionModalOpen] = useState(false);
   const [isNudgeModalOpen, setIsNudgeModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [pendingTaskData, setPendingTaskData] = useState<Partial<Task> | null>(null);
   const [lastConfirmation, setLastConfirmation] = useState<string | null>(null);
@@ -238,6 +239,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
+      {/* Sidebar - Desktop Only */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-10 hidden md:flex">
         <div className="p-6 overflow-y-auto custom-scrollbar">
           <div className="flex items-center gap-3 text-slate-900 mb-8">
@@ -285,12 +287,14 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-64 relative flex flex-col min-h-screen">
+      {/* Main Content Area */}
+      <main className="flex-1 md:ml-64 relative flex flex-col min-h-screen pb-24 md:pb-12">
         <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4 flex items-center justify-between md:hidden sticky top-0 z-20">
           <div className="flex items-center gap-2 font-bold"><Building2 className="w-6 h-6" /> {currentOrg} Ops</div>
           <button onClick={() => setIsModalOpen(true)} className="p-2 bg-slate-900 text-white rounded-lg"><Plus className="w-5 h-5" /></button>
         </header>
-        <div className="flex-1 pb-12">
+
+        <div className="flex-1">
           {isLoading ? (
              <div className="flex flex-col items-center justify-center h-96">
                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
@@ -298,12 +302,12 @@ function App() {
              </div>
           ) : (
             <>
-              <div className="px-8 pt-8 pb-4 flex justify-between items-end">
+              <div className="px-6 md:px-8 pt-8 pb-4 flex justify-between items-end">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                  <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
                     {viewMode === 'Overview' ? 'Workspace Dashboard' : viewMode === 'Today' ? "Today's Operational Flow" : `${viewMode === 'Client' ? clientLabel : (viewMode === 'Junior' ? juniorLabel : viewMode)} Dashboard`}
                   </h2>
-                  <p className="text-slate-500 mt-1 font-medium">{currentOrg} &bull; {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-slate-500 mt-1 font-medium text-xs md:text-sm">{currentOrg} &bull; {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                 </div>
                 {viewMode !== 'Overview' && (
                   <button onClick={() => setIsModalOpen(true)} className="hidden md:flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 shadow-sm transition-all">
@@ -319,6 +323,87 @@ function App() {
             </>
           )}
         </div>
+
+        {/* Mobile Bottom Navigation - Visible only on Mobile */}
+        <div className="md:hidden fixed bottom-6 left-4 right-4 z-[100] animate-in slide-in-from-bottom-8 duration-500">
+          <div className="bg-white/90 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-[32px] flex items-center justify-around py-2 px-1 relative">
+            <MobileNavItem 
+              active={viewMode === 'Overview'} 
+              icon={LayoutDashboard} 
+              label="Home" 
+              onClick={() => { setViewMode('Overview'); setIsMobileMenuOpen(false); }} 
+            />
+            <MobileNavItem 
+              active={viewMode === 'Today'} 
+              icon={Star} 
+              label="Priority" 
+              onClick={() => { setViewMode('Today'); setIsMobileMenuOpen(false); }} 
+            />
+            <MobileNavItem 
+              active={viewMode === 'Client'} 
+              icon={ClientIcon} 
+              label={currentOrg === 'EY' ? 'Clients' : 'Sewa'} 
+              onClick={() => { setViewMode('Client'); setIsMobileMenuOpen(false); }} 
+            />
+            <MobileNavItem 
+              active={viewMode === 'Junior'} 
+              icon={Users} 
+              label={currentOrg === 'EY' ? 'People' : 'Sewadars'} 
+              onClick={() => { setViewMode('Junior'); setIsMobileMenuOpen(false); }} 
+            />
+            <MobileNavItem 
+              active={isMobileMenuOpen} 
+              icon={MoreHorizontal} 
+              label="More" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            />
+
+            {/* Mobile More Tools Drawer */}
+            {isMobileMenuOpen && (
+              <div className="absolute bottom-[calc(100%+12px)] left-0 right-0 animate-in slide-in-from-bottom-4 fade-in duration-300">
+                <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl p-4 flex flex-col gap-2">
+                   <h4 className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Extended Tools</h4>
+                   <button 
+                    onClick={() => { setViewMode('Category'); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 hover:bg-slate-100 text-slate-600 font-semibold text-sm"
+                   >
+                    <Filter className="w-5 h-5" />
+                    By Category
+                   </button>
+                   <button 
+                    onClick={() => { setIsExtractionModalOpen(true); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 hover:bg-blue-50 text-blue-600 font-bold text-sm"
+                   >
+                    <Sparkles className="w-5 h-5" />
+                    Extract Actions
+                   </button>
+                   <button 
+                    onClick={() => { setIsNudgeModalOpen(true); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 hover:bg-indigo-50 text-indigo-600 font-bold text-sm"
+                   >
+                    <MessageSquare className="w-5 h-5" />
+                    Nudge Agent
+                   </button>
+                   <div className="h-px bg-slate-100 my-1" />
+                   <button 
+                    onClick={() => { setIsProfileModalOpen(true); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 hover:bg-slate-100 text-slate-500 font-semibold text-sm"
+                   >
+                    <Settings className="w-5 h-5" />
+                    Settings & Profile
+                   </button>
+                   <button 
+                    onClick={() => { setCurrentOrg(null); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all duration-200 hover:bg-rose-50 text-rose-600 font-bold text-sm"
+                   >
+                    <LogOut className="w-5 h-5" />
+                    Switch Workspace
+                   </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </main>
 
       <TaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={addTask} existingClients={existingClients} existingJuniors={existingJuniors} clientLabel={clientLabel} juniorLabel={juniorLabel} />
@@ -328,5 +413,23 @@ function App() {
     </div>
   );
 }
+
+// Helper component for mobile bottom nav
+const MobileNavItem = ({ active, icon: Icon, label, onClick }: { active: boolean, icon: any, label: string, onClick: () => void }) => (
+  <button 
+    onClick={onClick}
+    className="flex flex-col items-center justify-center py-2 px-1 flex-1 relative transition-all duration-300"
+  >
+    <div className={`p-2 rounded-2xl transition-all duration-300 mb-0.5 ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 -translate-y-1' : 'text-slate-400'}`}>
+      <Icon className={`w-5 h-5 ${active ? 'scale-110' : 'scale-100'}`} />
+    </div>
+    <span className={`text-[9px] font-bold tracking-tight transition-all ${active ? 'text-blue-600' : 'text-slate-400'}`}>
+      {label}
+    </span>
+    {active && (
+      <div className="absolute -top-1 w-1 h-1 bg-blue-600 rounded-full animate-pulse" />
+    )}
+  </button>
+);
 
 export default App;
