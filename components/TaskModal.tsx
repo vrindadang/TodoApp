@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ChevronRight, Briefcase, Rocket, FileText, Settings, HeartHandshake } from 'lucide-react';
+import { X, ChevronRight, Briefcase, Rocket, FileText, Settings, HeartHandshake, Calendar } from 'lucide-react';
 import { Category, Priority, Task } from '../types.ts';
 
 interface TaskModalProps {
@@ -21,6 +21,7 @@ const CategoryIcon = ({ category }: { category: Category }) => {
     case Category.Pursuits: return <Rocket className="w-4 h-4" />;
     case Category.Proposals: return <FileText className="w-4 h-4" />;
     case Category.AdminWork: return <Settings className="w-4 h-4" />;
+    case Category.Meetings: return <Calendar className="w-4 h-4" />;
     default: return null;
   }
 };
@@ -133,7 +134,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider">Classification</label>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {[Category.Deliverables, Category.AdminWork, Category.Pursuits, Category.Proposals].map((cat) => (
+                {[Category.Deliverables, Category.AdminWork, Category.Meetings, Category.Pursuits, Category.Proposals].map((cat) => (
                   <button
                     key={cat}
                     type="button"

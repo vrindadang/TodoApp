@@ -1,3 +1,4 @@
+
 # Executive Legal & Tax Operations Assistant
 
 A professional task management system designed for EY and SKRM workspaces, featuring AI-powered task extraction and follow-up drafting.
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     description TEXT NOT NULL,
     client TEXT NOT NULL,
     org TEXT NOT NULL CHECK (org IN ('EY', 'SKRM')),
-    category TEXT NOT NULL CHECK (category IN ('Deliverables', 'Pursuits', 'Proposals', 'Admin Work', 'General')),
+    category TEXT NOT NULL CHECK (category IN ('Deliverables', 'Pursuits', 'Proposals', 'Admin Work', 'Meetings', 'General')),
     deadline DATE NOT NULL,
     junior TEXT,
     status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'In Progress', 'Review', 'Completed')),

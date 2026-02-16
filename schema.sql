@@ -1,3 +1,4 @@
+
 -- 1. Create the tasks table with strict constraints matching the app's types.ts
 -- This follows the exact structure you provided but ensures the policies are applied.
 CREATE TABLE IF NOT EXISTS public.tasks (
@@ -5,7 +6,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     description text NOT NULL,
     client text NOT NULL,
     org text NOT NULL CHECK (org = ANY (ARRAY['EY'::text, 'SKRM'::text])),
-    category text NOT NULL CHECK (category = ANY (ARRAY['Deliverables'::text, 'Pursuits'::text, 'Proposals'::text, 'Admin Work'::text, 'General'::text])),
+    category text NOT NULL CHECK (category = ANY (ARRAY['Deliverables'::text, 'Pursuits'::text, 'Proposals'::text, 'Admin Work'::text, 'Meetings'::text, 'General'::text])),
     deadline date NOT NULL,
     junior text,
     status text NOT NULL DEFAULT 'Pending'::text CHECK (status = ANY (ARRAY['Pending'::text, 'In Progress'::text, 'Review'::text, 'Completed'::text])),

@@ -39,6 +39,7 @@ Current Date Reference: ${new Date().toLocaleDateString()} (${new Date().toLocal
      - 'Pursuits': AI tools, strategy, research, internal goals.
      - 'Proposals': Pitches, new business, RFPs.
      - 'Admin Work': Invoicing, forms, scheduling, logistics.
+     - 'Meetings': Calls, conferences, internal syncs, client meetings.
 
 2. **View Switching**:
    - Targets: 'Today', 'Client', 'Category', 'Junior'.

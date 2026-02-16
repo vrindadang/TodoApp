@@ -4,6 +4,7 @@ export enum Category {
   Pursuits = 'Pursuits',
   Proposals = 'Proposals',
   AdminWork = 'Admin Work',
+  Meetings = 'Meetings',
   General = 'General'
 }
 
