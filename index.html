@@ -8,12 +8,13 @@
     <title>Executive Ops | Task Management</title>
     <script>
       // Robust polyfill for process.env before any modules load
+      // Note: API_KEY is handled externally. SUPABASE values are required for persistence.
       window.process = {
         env: {
           NODE_ENV: 'production',
           API_KEY: '',
-          SUPABASE_URL: '',
-          SUPABASE_KEY: ''
+          SUPABASE_URL: 'https://zjtocbovaghvgtxoflje.supabase.co',
+          SUPABASE_KEY: 'sb_publishable_k_wHUTOJdgT3hRjmcaIQyQ_1cHkM1i9'
         }
       };
       // Make it globally accessible for libraries that expect it

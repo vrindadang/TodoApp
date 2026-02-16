@@ -1,12 +1,12 @@
-
 import React, { useState, useMemo } from 'react';
 import { Task, ViewMode, Category, Status, Priority } from '../types.ts';
-import { Clock, User, CheckCircle2, Circle, AlertCircle, Search, Plus, Zap, MessageSquare } from 'lucide-react';
+import { Clock, User, CheckCircle2, Circle, AlertCircle, Search, Plus, Zap, MessageSquare, Trash2 } from 'lucide-react';
 
 interface TaskBoardProps {
   tasks: Task[];
   viewMode: ViewMode | 'Overview';
   onStatusChange: (id: string, status: Status) => void;
+  onDelete: (id: string) => void;
   onAddTaskToClient?: (clientName: string) => void;
   clientLabel: string;
   juniorLabel: string;
@@ -15,6 +15,7 @@ interface TaskBoardProps {
 interface TaskRowProps {
   task: Task;
   onStatusChange: (id: string, s: Status) => void;
+  onDelete: (id: string) => void;
   clientLabel: string;
 }
 
@@ -42,7 +43,7 @@ const PriorityBadge = ({ priority }: { priority: Priority }) => {
   );
 };
 
-const TaskRow: React.FC<TaskRowProps> = ({ task, onStatusChange, clientLabel }) => {
+const TaskRow: React.FC<TaskRowProps> = ({ task, onStatusChange, onDelete, clientLabel }) => {
   const isOverdue = new Date(task.deadline).setHours(0,0,0,0) <= new Date().setHours(0,0,0,0) && task.status !== Status.Completed;
 
   return (
@@ -69,6 +70,16 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, onStatusChange, clientLabel }) 
             <span className={`text-xs font-mono px-2 py-1 rounded-full ${isOverdue ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}`}>
               {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
             </span>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(task.id);
+              }}
+              className="p-1 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded transition-all opacity-0 group-hover:opacity-100"
+              title="Delete Entry"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
         
@@ -93,11 +104,12 @@ interface GroupSectionProps {
   title: string;
   tasks: Task[];
   onStatusChange: (id: string, s: Status) => void;
+  onDelete: (id: string) => void;
   onAddClick?: () => void;
   clientLabel: string;
 }
 
-const GroupSection: React.FC<GroupSectionProps> = ({ title, tasks, onStatusChange, onAddClick, clientLabel }) => {
+const GroupSection: React.FC<GroupSectionProps> = ({ title, tasks, onStatusChange, onDelete, onAddClick, clientLabel }) => {
   if (tasks.length === 0) return null;
   return (
     <div className="mb-8 break-inside-avoid">
@@ -118,14 +130,14 @@ const GroupSection: React.FC<GroupSectionProps> = ({ title, tasks, onStatusChang
       </div>
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         {tasks.map(task => (
-          <TaskRow key={task.id} task={task} onStatusChange={onStatusChange} clientLabel={clientLabel} />
+          <TaskRow key={task.id} task={task} onStatusChange={onStatusChange} onDelete={onDelete} clientLabel={clientLabel} />
         ))}
       </div>
     </div>
   );
 };
 
-export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusChange, onAddTaskToClient, clientLabel, juniorLabel }) => {
+export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusChange, onDelete, onAddTaskToClient, clientLabel, juniorLabel }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredTasks = useMemo(() => {
@@ -151,7 +163,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusC
         const todayTasks = filteredTasks.filter(t => t.deadline === todayStr);
         return (
           <div className="space-y-2">
-            <GroupSection title="Priorities for Today" tasks={todayTasks} onStatusChange={onStatusChange} clientLabel={clientLabel} />
+            <GroupSection title="Priorities for Today" tasks={todayTasks} onStatusChange={onStatusChange} onDelete={onDelete} clientLabel={clientLabel} />
             {todayTasks.length === 0 && (
               <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
                 <CheckCircle2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -167,7 +179,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusC
         return (
           <div className="space-y-2">
             {clients.map((client) => (
-              <GroupSection key={client} title={client} tasks={filteredTasks.filter(t => t.client === client)} onStatusChange={onStatusChange} onAddClick={() => onAddTaskToClient?.(client)} clientLabel={clientLabel} />
+              <GroupSection key={client} title={client} tasks={filteredTasks.filter(t => t.client === client)} onStatusChange={onStatusChange} onDelete={onDelete} onAddClick={() => onAddTaskToClient?.(client)} clientLabel={clientLabel} />
             ))}
           </div>
         );
@@ -176,7 +188,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusC
         return (
           <div className="space-y-2">
             {Object.values(Category).map((cat) => (
-              <GroupSection key={cat} title={cat as string} tasks={filteredTasks.filter(t => t.category === cat)} onStatusChange={onStatusChange} clientLabel={clientLabel} />
+              <GroupSection key={cat} title={cat as string} tasks={filteredTasks.filter(t => t.category === cat)} onStatusChange={onStatusChange} onDelete={onDelete} clientLabel={clientLabel} />
             ))}
           </div>
         );
@@ -186,7 +198,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, viewMode, onStatusC
         return (
           <div className="space-y-2">
             {juniors.map((junior) => (
-              <GroupSection key={junior} title={junior} tasks={filteredTasks.filter(t => (t.junior || 'Unassigned') === junior)} onStatusChange={onStatusChange} clientLabel={clientLabel} />
+              <GroupSection key={junior} title={junior} tasks={filteredTasks.filter(t => (t.junior || 'Unassigned') === junior)} onStatusChange={onStatusChange} onDelete={onDelete} clientLabel={clientLabel} />
             ))}
           </div>
         );
